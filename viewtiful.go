@@ -1,4 +1,4 @@
-package picamera
+package main
 
 import (
 	"bufio"
@@ -15,16 +15,15 @@ type message struct {
 }
 
 func main() {
-	site := "ws://therileyjohnson.com/spyer"
+	site := "ws://www.therileyjohnson.com/wsspy"
 	var dialer websocket.Dialer
 	var m message
 
-	c := camera.New("pics/")
 	conn, _, err := dialer.Dial(site, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	c := camera.New("pics/")
 	for {
 		conn.ReadJSON(&m)
 		if err != nil {
