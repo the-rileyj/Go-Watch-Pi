@@ -1,4 +1,4 @@
-package main
+package picamera
 
 import (
 	"bufio"
@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/gorilla/websocket"
-	"picamera"
+	"github.com/loranbriggs/go-camera"
 )
 
 type message struct {
@@ -15,24 +15,27 @@ type message struct {
 }
 
 func main() {
+	site := "ws://therileyjohnson.com/spyer"
 	var dialer websocket.Dialer
 	var m message
-	c := camera.New("pics")
-	conn, _, err := dialer.Dial("ws://therileyjohnson.com/spyer", nil)
+
+	c := camera.New("/pics")
+	conn, _, err := dialer.Dial(site, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	for {
 		conn.ReadJSON(&m)
 		if err != nil {
 			fmt.Printf("Error::: %s\n", err.Error())
 			return
 		}
-		s, err := c.Camera.Capture()
+		s, err := c.Capture()
 		if err != nil {
-			printf("Problem with camera\n%s", err)
+			fmt.Printf("Problem with camera\n%s", err)
 		}
-		file, _ := os.Open("/pics/pic.png")
+		file, _ := os.Open(s)
 		defer file.Close()
 		fileInfo, _ := file.Stat()
 		size := fileInfo.Size()
