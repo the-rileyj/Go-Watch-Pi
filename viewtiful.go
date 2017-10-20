@@ -19,7 +19,7 @@ func main() {
 	var dialer websocket.Dialer
 	var m message
 
-	c := camera.New("/pics")
+	c := camera.New("pics/")
 	conn, _, err := dialer.Dial(site, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -43,5 +43,6 @@ func main() {
 		buffer := bufio.NewReader(file)
 		_, err = buffer.Read(sbytes)
 		conn.WriteMessage(websocket.TextMessage, sbytes)
+		os.Remove(s)
 	}
 }
