@@ -88,7 +88,7 @@ func main() {
 				fmt.Println("Error Creating File Upload", err)
 			}
 
-			if err := client.Do(req); err != nil {
+			if _, err := client.Do(req); err != nil {
 				fmt.Println("Error Making POST Request", err)
 			}
 
