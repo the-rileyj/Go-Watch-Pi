@@ -52,9 +52,10 @@ func main() {
 			sbytes := make([]byte, size)
 			buffer := bufio.NewReader(file)
 			_, err = buffer.Read(sbytes)
-			if err := conn.WriteJSON(message{true, "", sbytes}); err != nil {
+			conn.WriteMessage(websocket.TextMessage, sbytes)
+			/*if err := conn.WriteJSON(message{true, "", sbytes}); err != nil {
 				fmt.Println("JSON writing error", err)
-			}
+			}*/
 			file.Close()
 			go os.Remove(s)
 		}
