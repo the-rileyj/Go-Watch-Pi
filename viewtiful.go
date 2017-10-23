@@ -72,8 +72,7 @@ func main() {
 		}
 
 		for {
-			err = conn.ReadJSON(&m)
-			if err != nil {
+			if err = conn.ReadJSON(&m); err != nil {
 				fmt.Println("JSON Read Error", err.Error())
 				break
 			}
