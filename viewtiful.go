@@ -17,7 +17,7 @@ type message struct {
 }
 
 func main() {
-	site := "ws://therileyjohnson.com/wsspy"
+	site := "ws://www.therileyjohnson.com/wsspy"
 	var dialer websocket.Dialer
 	var m message
 	c := camera.New("pics/")
@@ -52,7 +52,9 @@ func main() {
 			sbytes := make([]byte, size)
 			buffer := bufio.NewReader(file)
 			_, err = buffer.Read(sbytes)
-			conn.WriteJSON(message{true, "", sbytes})
+			if err := conn.WriteJSON(message{true, "", sbytes}); err != nil {
+				fmt.Println("JSON writing error", err)
+			}
 			file.Close()
 			go os.Remove(s)
 		}
