@@ -28,17 +28,14 @@ func main() {
 	s, err := c.Capture()
 	if err != nil {
 		fmt.Printf("Problem with camera\n%s\n", err)
-		break
 	}
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Printf("Problem with getting working directory\n%s\n", err)
-		break
 	}
 	file, err := os.Open(wd + "/" + s)
 	if err != nil {
 		fmt.Printf("Problem with file\n%s\n", err)
-		break
 	}
 	fileInfo, _ := file.Stat()
 	size := fileInfo.Size()
