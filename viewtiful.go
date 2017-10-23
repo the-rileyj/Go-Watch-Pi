@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
@@ -11,37 +12,40 @@ import (
 )
 
 type message struct {
-	message string
+	Pi      bool   `json:"pi"`
+	Message string `json:"message"`
 }
 
 func main() {
-	site := "ws://www.therileyjohnson.com/wsspy"
+	site := "ws://therileyjohnson.com/wsspy"
 	var dialer websocket.Dialer
 	var m message
-
-	conn, _, err := dialer.Dial(site, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
 	c := camera.New("pics/")
 	for {
-		conn.ReadJSON(&m)
+		conn, _, err := dialer.Dial(site, nil)
 		if err != nil {
-			fmt.Printf("Error::: %s\n", err.Error())
-			return
+			log.Fatal(err)
 		}
-		s, err := c.Capture()
-		if err != nil {
-			fmt.Printf("Problem with camera\n%s", err)
+		for {
+			err = conn.ReadJSON(&m)
+			if err != nil {
+				fmt.Printf("JSON Read Error\n%s\n", err.Error())
+				break
+			}
+			s, err := c.Capture()
+			if err != nil {
+				fmt.Printf("Problem with camera\n%s\n", err)
+				break
+			}
+			file, _ := os.Open(s)
+			fileInfo, _ := file.Stat()
+			size := fileInfo.Size()
+			sbytes := make([]byte, size)
+			buffer := bufio.NewReader(file)
+			_, err = buffer.Read(sbytes)
+			conn.WriteJSON(message{true, base64.StdEncoding.EncodeToString(sbytes)})
+			file.Close()
+			os.Remove(s)
 		}
-		file, _ := os.Open(s)
-		defer file.Close()
-		fileInfo, _ := file.Stat()
-		size := fileInfo.Size()
-		sbytes := make([]byte, size)
-		buffer := bufio.NewReader(file)
-		_, err = buffer.Read(sbytes)
-		conn.WriteMessage(websocket.TextMessage, sbytes)
-		os.Remove(s)
 	}
 }
