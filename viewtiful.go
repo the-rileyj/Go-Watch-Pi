@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
@@ -14,6 +13,7 @@ import (
 type message struct {
 	Pi      bool   `json:"pi"`
 	Message string `json:"message"`
+	Pic     []byte `json:"pic"`
 }
 
 func main() {
@@ -52,9 +52,9 @@ func main() {
 			sbytes := make([]byte, size)
 			buffer := bufio.NewReader(file)
 			_, err = buffer.Read(sbytes)
-			conn.WriteJSON(message{true, base64.StdEncoding.EncodeToString(sbytes)})
+			conn.WriteJSON(message{true, "", sbytes})
 			file.Close()
-			os.Remove(s)
+			go os.Remove(s)
 		}
 	}
 }
