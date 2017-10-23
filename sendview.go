@@ -19,7 +19,7 @@ type message struct {
 func main() {
 	site := "ws://www.therileyjohnson.com/wsspy"
 	var dialer websocket.Dialer
-	var m message
+	//var m message
 	c := camera.New("pics/")
 	for {
 		conn, _, err := dialer.Dial(site, nil)
