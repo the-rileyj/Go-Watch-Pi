@@ -37,7 +37,7 @@ func main() {
 				fmt.Printf("Problem with camera\n%s\n", err)
 				break
 			}
-			file, err := os.Open(s)
+			file, err := os.Open(os.Getwd() + s)
 			if err != nil {
 				fmt.Printf("Problem with file\n%s\n", err)
 				break
