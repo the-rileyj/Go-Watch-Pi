@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"mime/multipart"
