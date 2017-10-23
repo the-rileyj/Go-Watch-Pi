@@ -1,14 +1,19 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
+	//"bufio"
+	//"fmt"
+	//"log"
 	"os"
-    "mime/multipart"
+	"mime/multipart"
+	"net/http"
+	"io"
+	"bytes"
+	"path/filepath"
 
-	"github.com/gorilla/websocket"
-	"github.com/loranbriggs/go-camera"
+	//"github.com/gorilla/websocket"
+	//"github.com/loranbriggs/go-camera"
 )
 
 
@@ -39,7 +44,7 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 	req, err := http.NewRequest("POST", uri, body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	return req, err
-  }
+}
 
 type message struct {
 	Pi      bool   `json:"pi"`
@@ -47,27 +52,29 @@ type message struct {
 }
 
 func main() {
-	site := "ws://www.therileyjohnson.com/wsspy"
+	path, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Problem with getting working directory", err)
+	}
+
+	client := &http.Client{}
+	wsite := "ws://www.therileyjohnson.com/wsspy"
+	psite := "http://www.therileyjohnson.com/subphoto"
 	var dialer websocket.Dialer
 	var m message
 	c := camera.New("pics/")
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Printf("Problem with getting working directory\n%s\n", err)
-		break
-	}
+
 	for {
-		conn, _, err := dialer.Dial(site, nil)
+		conn, _, err := dialer.Dial(wsite, nil)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("Error astablishing websocket connection with site", err)
+			break
 		}
 
 		for {
-			var b bytes.Buffer
-			w := multipart.NewWriter(&b)
 			err = conn.ReadJSON(&m)
 			if err != nil {
-				fmt.Printf("JSON Read Error\n%s\n", err.Error())
+				fmt.Println("JSON Read Error", err.Error())
 				break
 			}
 
@@ -76,46 +83,21 @@ func main() {
 				fmt.Printf("Problem with camera\n%s\n", err)
 				break
 			}
-			newfileUploadRequest("", nil, "pimg", wd + "/" + s)
-			// file, err := os.Open(wd + "/" + s)
-			// if err != nil {
-			// 	fmt.Printf("Problem with file\n%s\n", err)
-			// 	break
-			// }
+			
+			req, err := newfileUploadRequest(psite, nil, "pimg", path + "/" + s)
+			if err != nil {
+				fmt.Println("Error Creating File Upload", err)
+			}
 
-			// fw, err := w.CreateFormFile("image", wd + "/" + s)
-			// if err != nil {
-			// 	fmt.Printf("Problem with adding file to form\n%s\n", err)
-			// 	return 
-			// }
+			if err := client.Do(req); err != nil {
+				fmt.Println("Error Making POST Request", err)
+			}
 
-			// if _, err = io.Copy(fw, f); err != nil {
-			// 	fmt.Printf("Problem with copying file to form\n%s\n", err)
-			// 	return
-			// }
-
-			// if fw, err = w.CreateFormField("pim"); err != nil {
-			// 	return
-			// }
-			// if _, err = fw.Write([]byte("PIM")); err != nil {
-			// 	return
-			// }
-
-			// w.Close()
-			// req, err := http.NewRequest("POST", url, &b)
-			// if err != nil {
-			// 	return 
-			// }
-			// fileInfo, _ := file.Stat()
-			// size := fileInfo.Size()
-			// sbytes := make([]byte, size)
-			// buffer := bufio.NewReader(file)
-			// _, err = buffer.Read(sbytes)
-			//conn.WriteMessage(websocket.TextMessage, sbytes)
-			/*if err := conn.WriteJSON(message{true, "", sbytes}); err != nil {
+			if err := conn.WriteJSON(message{true, ""}); err != nil {
 				fmt.Println("JSON writing error", err)
-			}*/
-			go os.Remove(wd + "/" + s)
+			}
+
+			go os.Remove(path + "/" + s)
 		}
 	}
 }
