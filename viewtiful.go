@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	//"bufio"
-	//"fmt"
-	//"log"
+	"bufio"
+	"fmt"
+	"log"
 	"os"
 	"mime/multipart"
 	"net/http"
@@ -12,8 +12,8 @@ import (
 	"bytes"
 	"path/filepath"
 
-	//"github.com/gorilla/websocket"
-	//"github.com/loranbriggs/go-camera"
+	"github.com/gorilla/websocket"
+	"github.com/loranbriggs/go-camera"
 )
 
 
