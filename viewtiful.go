@@ -99,7 +99,7 @@ func main() {
 		conn, _, err := dialer.Dial(wsite, nil)
 		if err != nil {
 			fmt.Println("Error astablishing websocket connection with site", err)
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second * 2)
 			continue
 		}
 
@@ -107,6 +107,22 @@ func main() {
 			if err = conn.ReadJSON(&m); err != nil {
 				fmt.Println("JSON Read Error", err.Error())
 				break
+			}
+
+			if m.Message != "" {
+				if strings.Contains(m.Message, "hflip") {
+					c.Hflip(true)
+				} else {
+					c.Hflip(false)
+				}
+				if strings.Contains(m.Message, "vflip") {
+					c.Vflip(true)
+				} else {
+					c.Vflip(false)
+				}
+			} else {
+				c.Hflip(false)
+				c.Vflip(false)
 			}
 
 			s, err := c.Capture()
