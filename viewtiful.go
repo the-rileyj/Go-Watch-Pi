@@ -1,6 +1,7 @@
 package main
 
 import (
+	"time"
 	"fmt"
 	"log"
 	"os"
@@ -66,7 +67,8 @@ func main() {
 		conn, _, err := dialer.Dial(wsite, nil)
 		if err != nil {
 			log.Fatal("Error astablishing websocket connection with site", err)
-			break
+			time.Sleep(time.Second * 5)
+			continue
 		}
 
 		for {
