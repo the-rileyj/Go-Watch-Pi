@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 	"fmt"
-	"log"
 	"os"
 	"mime/multipart"
 	"net/http"
