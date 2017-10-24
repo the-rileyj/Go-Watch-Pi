@@ -46,7 +46,7 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 
 func checkCamera(c chan bool) {
 	out, _ := exec.Command("vcgencmd", "get_camera").Output()
-	while(!strings.Contains(out, "supported=1 detected=1")){
+	for !strings.Contains(out, "supported=1 detected=1") {
 		out, _ = exec.Command("vcgencmd", "get_camera").Output()
 		time.Sleep(time.Second)
 	}
@@ -55,7 +55,7 @@ func checkCamera(c chan bool) {
 
 func checkInternet(c chan bool) {
 	out, _ := exec.Command("vcgencmd", "get_camera").Output()
-	while(strings.Contains(out, "connect: Network is unreachable")){
+	for strings.Contains(out, "connect: Network is unreachable") {
 		out, _ = exec.Command("vcgencmd", "get_camera").Output()
 		time.Sleep(time.Second)
 	}
@@ -72,7 +72,7 @@ func main() {
 	oC, oI := make(chan bool, chan bool)
 	go checkCamera(oC)
 	go checkInternet(oI)
-	
+
 	for !(onCam && onInt) {
 		select{
 		case v := <- oC:
