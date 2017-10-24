@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"time"
 	"fmt"
 	"os"
@@ -13,7 +14,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/loranbriggs/go-camera"
 )
-
 
 //From: https://matt.aimonetti.net/posts/2013/07/01/golang-multipart-file-upload-example/
 func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
@@ -44,12 +44,44 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 	return req, err
 }
 
+func checkCamera(c chan bool) {
+	out, _ := exec.Command("vcgencmd", "get_camera").Output()
+	while(!strings.Contains(out, "supported=1 detected=1")){
+		out, _ = exec.Command("vcgencmd", "get_camera").Output()
+		time.Sleep(time.Second)
+	}
+	c <- true
+}
+
+func checkInternet(c chan bool) {
+	out, _ := exec.Command("vcgencmd", "get_camera").Output()
+	while(strings.Contains(out, "connect: Network is unreachable")){
+		out, _ = exec.Command("vcgencmd", "get_camera").Output()
+		time.Sleep(time.Second)
+	}
+	c <- true
+}
+
 type message struct {
 	Pi      bool   `json:"pi"`
 	Message string `json:"message"`
 }
 
 func main() {
+	onCam, onInt := false, false
+	oC, oI := make(chan bool, chan bool)
+	go checkCamera(oC)
+	go checkInternet(oI)
+	
+	for !(onCam && onInt) {
+		select{
+		case v := <- oC:
+			onCam = true
+		case v := <- oC:
+			onInt = true	
+		}
+	}
+	
 	path, err := os.Getwd()
 	if err != nil {
 		fmt.Println("Problem with getting working directory", err)
