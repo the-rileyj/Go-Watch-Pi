@@ -13,7 +13,8 @@ import (
 	"os/exec"
 
 	"github.com/gorilla/websocket"
-	"github.com/loranbriggs/go-camera"
+	//"github.com/loranbriggs/go-camera"
+	"github.com/the-rileyj/go-camera"
 )
 
 //From: https://matt.aimonetti.net/posts/2013/07/01/golang-multipart-file-upload-example/
@@ -93,7 +94,7 @@ func main() {
 	psite := "http://www.therileyjohnson.com/subphoto"
 	var dialer websocket.Dialer
 	var m message
-	c := camera.New("pics/")
+	c := camera.New("pics/", "", "")
 
 	for {
 		conn, _, err := dialer.Dial(wsite, nil)
